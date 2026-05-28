@@ -1,8 +1,8 @@
-# What 
+## What 
 
 Chat app to learn django websockets / channels fundamental for a more interesting project.
 
-# Building
+## Building
 
 - Docker version >= 20
 
@@ -11,7 +11,7 @@ docker compose up --build
 ```
 
 
-# Scope 
+## Scope 
 - Have users
 - Have rooms, maybe with the rooms having permissions
 - Have a telegram-like UI for choosing rooms 
@@ -20,7 +20,7 @@ docker compose up --build
 
 ![Flow diagram](<docs/flow_diagram.png>)
 
-# Tasks 
+## Tasks 
 - [x] Make messages persist
 - [x] Make sure that the client is able to view room history, not just the newest messages
     - [ ] Send only a most recent window of history, and send more on request.
@@ -38,3 +38,11 @@ docker compose up --build
         - [ ] Room owner can add other users to a blacklist
     - [ ] Rooms can be made private
       - [ ] Room owner can add other users to a whitelist
+
+## References
+
+- https://www.w3schools.com/django/index.php
+- https://www.geeksforgeeks.org/python/learn-to-use-websockets-with-django/
+- https://channels.readthedocs.io/en/latest/tutorial/part_2.html
+- https://www.docker.com/blog/how-to-dockerize-django-app/
+- https://github.com/jpadilla/django-project-template/blob/master/.gitignore
