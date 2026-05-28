@@ -28,18 +28,6 @@
         <div class="card-body d-flex align-items-center gap-2">
           <span class="me-1">Your name:</span>
           <strong id="display-name-display">{{ display_name }} </strong>
-          <input
-            id="display-name-input"
-            type="text"
-            class="form-control form-control-sm w-auto ms-2"
-            placeholder="Enter name…"
-          />
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            onclick="setDisplayName()"
-          >
-            Set
-          </button>
           <form method="post" action="/accounts/logout/" class="ms-auto mb-0">
             {% csrf_token %}
             <button type="submit" class="btn btn-sm btn-outline-danger">Logout</button>
@@ -78,14 +66,6 @@
         errorTimeout = setTimeout(() => {
           banner.style.display = "none";
         }, 4000);
-      };
-
-      const setDisplayName = () => {
-        const val = document.getElementById("display-name-input").value.trim();
-        if (!val) return;
-        displayName = val;
-        document.getElementById("display-name-display").textContent = val;
-        document.getElementById("display-name-input").value = "";
       };
 
       const socket = new WebSocket(
