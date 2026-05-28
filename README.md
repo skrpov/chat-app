@@ -26,7 +26,7 @@ docker compose up --build
     - [ ] Send only a most recent window of history, and send more on request.
 - [ ] Dockerize the application and add running instructions
 - [ ] Ensure that on the client messages appear in the same order they were sent in
-- [ ] Make messages send to all connections, not just the sender.
+- [x] Make messages send to all connections, not just the sender.
 - [ ] Add authentication
     - [ ] Add a way to signup
     - [ ] Add a way to login

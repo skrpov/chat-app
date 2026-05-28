@@ -16,6 +16,7 @@ services:
     depends_on:
       - redis
     volumes:
+      - .:/app 
       - sqlite_data:/app/data/
 
 volumes:
