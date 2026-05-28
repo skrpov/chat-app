@@ -7,7 +7,8 @@
     <title>Messenger</title>
   </head>
   <body class="bg-light">
-    <div class="container py-4" style="max-width: 640px;">
+    <div id="error-banner" style="display:none; position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); z-index:9999; white-space:nowrap;" class="px-3 py-2 rounded bg-danger text-white small shadow"></div>
+    <div class="container py-4" style="max-width: 900px;">
 
       <div class="card mb-3">
         <div class="card-body d-flex align-items-center gap-2">
@@ -19,7 +20,7 @@
       </div>
 
       <div class="card mb-3">
-        <div class="card-body" id="messages" style="height: 400px; overflow-y: auto;">
+        <div class="card-body" id="messages" style="height: 600px; overflow-y: auto;">
         </div>
       </div>
 
@@ -32,6 +33,15 @@
 
     <script>
       let displayName = "Anonymous";
+      let errorTimeout = null;
+
+      const showError = (msg) => {
+        const banner = document.getElementById("error-banner");
+        banner.textContent = msg;
+        banner.style.display = "block";
+        clearTimeout(errorTimeout);
+        errorTimeout = setTimeout(() => { banner.style.display = "none"; }, 4000);
+      };
 
       const setDisplayName = () => {
         const val = document.getElementById("display-name-input").value.trim();
@@ -43,13 +53,36 @@
 
       const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
 
+      socket.onerror = () => showError("Connection error. Messages may not be sending.");
+
+      const isOwnMessage = (data) => data.display_name === displayName;
+
       socket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         const feed = document.getElementById("messages");
-        const p = document.createElement("p");
-        p.className = "mb-1";
-        p.innerHTML = `<strong>${data.display_name}</strong>: ${data.body}`;
-        feed.appendChild(p);
+        const own = isOwnMessage(data);
+
+        const wrapper = document.createElement("div");
+        wrapper.className = `d-flex mb-1 ${own ? "justify-content-end" : "justify-content-start"}`;
+
+        // TODO: Add logic to insert the message ordered according to the date/time on the messages, 
+        // then only display the time if the delta to the message below is large or the message below belongs to this 
+        // user or there is no message below.
+
+        const messageContainer = document.createElement("div");
+        messageContainer.style.maxWidth = "75%";
+        messageContainer.style.minWidth = "12rem";
+        messageContainer.innerHTML = `
+          <div class="d-flex justify-content-between align-items-baseline gap-3">
+            <span class="small text-muted fw-semibold">${data.display_name}</span>
+            <span class="text-muted" style="font-size: 0.7rem">${new Date(Date.now()).toLocaleTimeString()}</span>
+          </div>
+          <div class="px-2 py-1 border bg-light" style="border-radius: 0.5rem; width: 100%;">${data.body}</div>
+          ${own ? `<div class="text-end text-muted" style="font-size: 0.65rem">Delivered</div>` : ""}
+        `;
+
+        wrapper.appendChild(messageContainer);
+        feed.appendChild(wrapper);
         feed.scrollTop = feed.scrollHeight;
       };
 
@@ -57,6 +90,10 @@
         const input = document.getElementById("message-input");
         const message = input.value.trim();
         if (!message) return;
+        if (socket.readyState !== WebSocket.OPEN) {
+          showError("Failed to send message. Connection may be closed.");
+          return;
+        }
         socket.send(JSON.stringify({ display_name: displayName, body: message }));
         input.value = "";
       };

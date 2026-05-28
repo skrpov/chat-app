@@ -38,6 +38,7 @@ docker compose up --build
         - [ ] Room owner can add other users to a blacklist
     - [ ] Rooms can be made private
       - [ ] Room owner can add other users to a whitelist
+- [ ] Secure redis so that it does not accept connections from other sources.
 
 ## References
 
