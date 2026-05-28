@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def index(request):
-    template = loader.get_template("index.html")
+def messenger_view(request):
+    template = loader.get_template("messenger.html")
     messages = Message.objects.all().order_by("created_at")
     context = {
         "messages": messages,

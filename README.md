@@ -32,6 +32,11 @@ docker compose up --build
     - [x] Add a way to login
     - [x] Ensure that pages other then login and signup redirect on unauthenticated access
 - [ ] Add rooms 
+    - [ ] No rooms yet placeholder
+    - [ ] Switching rooms closes the connection to current room before opening another
+    - [ ] Adding a new room makes it correctly show up in the room list
+    - [ ] Room list order is stable
+    - [ ] Room settings are only visible to room owner
 - [ ] Add room permissions
     - [ ] Owners can own a room
     - [ ] Rooms can be made public
