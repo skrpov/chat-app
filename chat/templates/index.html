@@ -3,36 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <title>Messenger</title>
   </head>
   <body class="bg-light">
-    <div id="error-banner" style="display:none; position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); z-index:9999; white-space:nowrap;" class="px-3 py-2 rounded bg-danger text-white small shadow"></div>
-    <div class="container py-4" style="max-width: 900px;">
-
+    <div
+      id="error-banner"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        white-space: nowrap;
+      "
+      class="px-3 py-2 rounded bg-danger text-white small shadow"
+    ></div>
+    <div class="container py-4" style="max-width: 900px">
       <div class="card mb-3">
         <div class="card-body d-flex align-items-center gap-2">
           <span class="me-1">Your name:</span>
-          <strong id="display-name-display">Anonymous</strong>
-          <input id="display-name-input" type="text" class="form-control form-control-sm w-auto ms-2" placeholder="Enter name…" />
-          <button class="btn btn-sm btn-outline-secondary" onclick="setDisplayName()">Set</button>
+          <strong id="display-name-display">{{ display_name }} </strong>
+          <input
+            id="display-name-input"
+            type="text"
+            class="form-control form-control-sm w-auto ms-2"
+            placeholder="Enter name…"
+          />
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            onclick="setDisplayName()"
+          >
+            Set
+          </button>
+          <form method="post" action="/accounts/logout/" class="ms-auto mb-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Logout</button>
+          </form>
         </div>
       </div>
 
       <div class="card mb-3">
-        <div class="card-body" id="messages" style="height: 600px; overflow-y: auto;">
-        </div>
+        <div
+          class="card-body"
+          id="messages"
+          style="height: 600px; overflow-y: auto"
+        ></div>
       </div>
 
       <div class="input-group">
-        <input id="message-input" type="text" class="form-control" placeholder="Type a message…" />
+        <input
+          id="message-input"
+          type="text"
+          class="form-control"
+          placeholder="Type a message…"
+        />
         <button class="btn btn-primary" onclick="sendMessage()">Send</button>
       </div>
-
     </div>
 
     <script>
-      let displayName = "Anonymous";
+      let displayName = "{{ display_name }}";
       let errorTimeout = null;
 
       const showError = (msg) => {
@@ -40,7 +75,9 @@
         banner.textContent = msg;
         banner.style.display = "block";
         clearTimeout(errorTimeout);
-        errorTimeout = setTimeout(() => { banner.style.display = "none"; }, 4000);
+        errorTimeout = setTimeout(() => {
+          banner.style.display = "none";
+        }, 4000);
       };
 
       const setDisplayName = () => {
@@ -51,9 +88,12 @@
         document.getElementById("display-name-input").value = "";
       };
 
-      const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+      const socket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/",
+      );
 
-      socket.onerror = () => showError("Connection error. Messages may not be sending.");
+      socket.onerror = () =>
+        showError("Connection error. Messages may not be sending.");
 
       const isOwnMessage = (data) => data.display_name === displayName;
 
@@ -65,8 +105,8 @@
         const wrapper = document.createElement("div");
         wrapper.className = `d-flex mb-1 ${own ? "justify-content-end" : "justify-content-start"}`;
 
-        // TODO: Add logic to insert the message ordered according to the date/time on the messages, 
-        // then only display the time if the delta to the message below is large or the message below belongs to this 
+        // TODO: Add logic to insert the message ordered according to the date/time on the messages,
+        // then only display the time if the delta to the message below is large or the message below belongs to this
         // user or there is no message below.
 
         const messageContainer = document.createElement("div");
@@ -94,12 +134,17 @@
           showError("Failed to send message. Connection may be closed.");
           return;
         }
-        socket.send(JSON.stringify({ display_name: displayName, body: message }));
+        socket.send(
+          JSON.stringify({ display_name: displayName, body: message }),
+        );
         input.value = "";
       };
 
-      document.getElementById("message-input")
-        .addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
+      document
+        .getElementById("message-input")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") sendMessage();
+        });
 
       const feed = document.getElementById("messages");
       feed.scrollTop = feed.scrollHeight;

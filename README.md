@@ -30,7 +30,7 @@ docker compose up --build
 - [x] Add authentication
     - [x] Add a way to signup
     - [x] Add a way to login
-    - [ ] Ensure that pages other then login and signup redirect on unauthenticated access
+    - [x] Ensure that pages other then login and signup redirect on unauthenticated access
 - [ ] Add rooms 
 - [ ] Add room permissions
     - [ ] Owners can own a room

@@ -26,7 +26,8 @@ SECRET_KEY = "django-insecure-90(ocqt_1od+cx^=gq6o)2zad$l^j!d2qzjt8e#ej41!hx9%@5
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "login"
 
 # Application definition
 
@@ -48,9 +49,7 @@ ASGI_APPLICATION = "config.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis", 6379)]
-        }
+        "CONFIG": {"hosts": [("redis", 6379)]},
     }
 }
 
