@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Messenger</title>
+  </head>
+  <body class="bg-light">
+    <div class="container py-4" style="max-width: 640px;">
+
+      <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-2">
+          <span class="me-1">Your name:</span>
+          <strong id="display-name-display">Anonymous</strong>
+          <input id="display-name-input" type="text" class="form-control form-control-sm w-auto ms-2" placeholder="Enter name…" />
+          <button class="btn btn-sm btn-outline-secondary" onclick="setDisplayName()">Set</button>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body" id="messages" style="height: 400px; overflow-y: auto;">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <input id="message-input" type="text" class="form-control" placeholder="Type a message…" />
+        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+      </div>
+
+    </div>
+
+    <script>
+      let displayName = "Anonymous";
+
+      const setDisplayName = () => {
+        const val = document.getElementById("display-name-input").value.trim();
+        if (!val) return;
+        displayName = val;
+        document.getElementById("display-name-display").textContent = val;
+        document.getElementById("display-name-input").value = "";
+      };
+
+      const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+
+      socket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        const feed = document.getElementById("messages");
+        const p = document.createElement("p");
+        p.className = "mb-1";
+        p.innerHTML = `<strong>${data.display_name}</strong>: ${data.body}`;
+        feed.appendChild(p);
+        feed.scrollTop = feed.scrollHeight;
+      };
+
+      const sendMessage = () => {
+        const input = document.getElementById("message-input");
+        const message = input.value.trim();
+        if (!message) return;
+        socket.send(JSON.stringify({ display_name: displayName, body: message }));
+        input.value = "";
+      };
+
+      document.getElementById("message-input")
+        .addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
+
+      const feed = document.getElementById("messages");
+      feed.scrollTop = feed.scrollHeight;
+    </script>
+  </body>
+</html>
