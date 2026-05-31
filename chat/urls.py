@@ -1,6 +1,9 @@
 from django.urls import path
-from .views import messenger_view
+from .views import messenger_view, create_room_view, join_room_view
 
 urlpatterns = [
+    path("rooms/create/", create_room_view, name="create_room"),
+    path("rooms/join/", join_room_view, name="join_room"),
     path("", messenger_view, name="home"),
+    path("<str:room_name>/", messenger_view, name="room"),
 ]

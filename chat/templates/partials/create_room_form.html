@@ -1,0 +1,36 @@
+<form hx-post="{% url 'create_room' %}" hx-target="this" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="create-room-name" class="form-label">Room name</label>
+    <input
+      type="text"
+      name="name"
+      id="create-room-name"
+      class="form-control{% if errors.name %} is-invalid{% endif %}"
+      placeholder="e.g. General"
+      value="{{ values.name|default:'' }}"
+      maxlength="255"
+      autocomplete="off"
+    />
+    {% if errors.name %}<div class="invalid-feedback">{{ errors.name }}</div>{% endif %}
+  </div>
+  <div class="mb-3">
+    <label for="create-room-id" class="form-label">Room ID</label>
+    <input
+      type="text"
+      name="room_id"
+      id="create-room-id"
+      class="form-control{% if errors.room_id %} is-invalid{% endif %}"
+      placeholder="e.g. general"
+      value="{{ values.room_id|default:'' }}"
+      maxlength="255"
+      autocomplete="off"
+    />
+    {% if errors.room_id %}
+      <div class="invalid-feedback">{{ errors.room_id }}</div>
+    {% else %}
+      <div class="form-text">A shareable ID others use to join this room.</div>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Create room</button>
+</form>

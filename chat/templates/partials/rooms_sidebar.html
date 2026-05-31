@@ -1,9 +1,10 @@
 <div class="card d-flex flex-column" style="width: 220px; min-width: 220px;">
   <div class="card-header fw-semibold d-flex align-items-center" style="height: 3rem;">Rooms</div>
   <div class="p-2 d-flex flex-column gap-1 overflow-y-auto flex-grow-1">
-    <button class="btn btn-sm my-1 p-2 btn-outline-primary rounded w-100 text-start">+ Add Room</button>
-    <button class="btn btn-sm my-1 p-2 btn-secondary rounded w-100 text-start">General</button>
-    <button class="btn btn-sm my-1 p-2 btn-outline-secondary rounded w-100 text-start">Another room placeholder</button>
+    <button type="button" class="btn btn-sm my-1 p-2 btn-outline-primary rounded w-100 text-start" data-bs-toggle="modal" data-bs-target="#addRoomModal">+ Add Room</button>
+    {% for saved_room in saved_rooms %}
+    <a href="{% url 'room' room_name=saved_room.room.id %}" class="btn btn-sm my-1 p-2 btn-outline-secondary rounded w-100 text-start text-truncate">{{ saved_room.room.name }}</a>
+    {% endfor %}
   </div>
   <div class="card-footer py-0 d-flex align-items-center gap-2" style="height: 3rem;">
     <span class="small text-muted text-truncate flex-grow-1">{{ display_name }}</span>

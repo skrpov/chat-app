@@ -1,0 +1,22 @@
+<form hx-post="{% url 'join_room' %}" hx-target="this" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="join-room-id" class="form-label">Room ID</label>
+    <input
+      type="text"
+      name="room_id"
+      id="join-room-id"
+      class="form-control{% if errors.room_id %} is-invalid{% endif %}"
+      placeholder="e.g. general"
+      value="{{ values.room_id|default:'' }}"
+      maxlength="255"
+      autocomplete="off"
+    />
+    {% if errors.room_id %}
+      <div class="invalid-feedback">{{ errors.room_id }}</div>
+    {% else %}
+      <div class="form-text">Enter the ID of an existing room to add it to your list.</div>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Join room</button>
+</form>

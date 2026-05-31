@@ -1,6 +1,6 @@
 ## What 
 
-Chat app to learn django websockets / channels fundamental for a more interesting project.
+Chat app to learn django websockets / channels fundamentals for a more interesting project.
 
 ## Building
 
@@ -9,7 +9,6 @@ Chat app to learn django websockets / channels fundamental for a more interestin
 ```sh
 docker compose up --build
 ```
-
 
 ## Scope 
 - Have users
