@@ -35,7 +35,7 @@ docker compose up --build
     - [ ] No rooms yet placeholder
     - [ ] Switching rooms closes the connection to current room before opening another
     - [x] Adding a new room makes it correctly show up in the room list
-    - [ ] Selected room is highlighted in the room list
+    - [x] Selected room is highlighted in the room list
     - [ ] Room list order is stable
     - [ ] Room settings are only visible to room owner
     - [x] Room name correctly shows up in the chat view
