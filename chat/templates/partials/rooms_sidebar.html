@@ -12,7 +12,7 @@
     {% endfor %}
   </div>
   <div class="card-footer py-0 d-flex align-items-center gap-2" style="height: 3rem;">
-    <span class="small text-muted text-truncate flex-grow-1">{{ display_name }}</span>
+    <span class="small text-muted text-truncate flex-grow-1">{{ user.username }}</span>
     <form method="post" action="/accounts/logout/" class="mb-0">
       {% csrf_token %}
       <button type="submit" class="btn btn-sm btn-outline-primary">Logout</button>

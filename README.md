@@ -37,7 +37,7 @@ docker compose up --build
     - [x] Adding a new room makes it correctly show up in the room list
     - [x] Selected room is highlighted in the room list
     - [ ] Room list order is stable
-    - [ ] Room settings are only visible to room owner
+    - [x] Room settings are only visible to room owner
     - [x] Room name correctly shows up in the chat view
 - [ ] Add room permissions
     - [x] Owners can own a room
