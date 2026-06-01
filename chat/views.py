@@ -73,5 +73,6 @@ def join_room_view(request):
             {"errors": errors, "values": {"room_id": room_id}},
         )
 
+    assert room is not None, "If room is None then errors is not and this path doesn't run"
     SavedRoom.objects.get_or_create(room=room, user=request.user)
     return _redirect_to_room(room.id)

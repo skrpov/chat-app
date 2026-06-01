@@ -27,8 +27,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def send_history(self):
         promises = []
-        # Only send messages for the current room.
-        async for message in Message.objects.select_related("sender"):
+        history = Message.objects.filter(room_id=self.room_id).select_related("sender")
+        async for message in history:
             promises.append(
                 self.send_packet(
                     make_packet(
@@ -44,15 +44,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
 
-        assert "url_route" in self.scope
-
-        self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
-        self.room_group_name = f"chat_{self.room_id}"
-
-        # TODO: Check that this group exists
-        SavedRoom.objects.select_related(self.room_id)
-
-        assert "user" in self.scope, "User must be provided by authentication stack middleware"
+        assert (
+            "user" in self.scope
+        ), "User must be provided by authentication stack middleware"
         assert self.scope["user"] is not None, "Provided auth user must not be None"
 
         self.user = self.scope["user"]
@@ -61,8 +55,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        assert "url_route" in self.scope
+        self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
+        self.room_group_name = f"chat_{self.room_id}"
+
+        is_saved_and_exists = await SavedRoom.objects.filter(
+            user=self.user, room_id=self.room_id
+        ).aexists()
+
+        if not is_saved_and_exists:
+            await self.close()
+            return
+
         await self.accept()
-        group_add_result = self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        group_add_result = self.channel_layer.group_add(
+            self.room_group_name, self.channel_name
+        )
         await self.send_history()
         await group_add_result
 
@@ -93,6 +101,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # finishes. Instead we supply the time to the db so that it can save in the background,
         # and we can still have synced times.
         message = Message(
+            room_id=self.room_id,
             sender=self.user,
             display_name=display_name,
             body=body,

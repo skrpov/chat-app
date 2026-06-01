@@ -30,19 +30,23 @@ docker compose up --build
     - [x] Add a way to signup
     - [x] Add a way to login
     - [x] Ensure that pages other then login and signup redirect on unauthenticated access
-- [ ] Add rooms 
+    - [ ] Display logged in user name in chat UI
+- [x] Add rooms 
     - [ ] No rooms yet placeholder
     - [ ] Switching rooms closes the connection to current room before opening another
-    - [ ] Adding a new room makes it correctly show up in the room list
+    - [x] Adding a new room makes it correctly show up in the room list
+    - [ ] Selected room is highlighted in the room list
     - [ ] Room list order is stable
     - [ ] Room settings are only visible to room owner
+    - [ ] Room name correctly shows up in the chat view
 - [ ] Add room permissions
-    - [ ] Owners can own a room
+    - [x] Owners can own a room
     - [ ] Rooms can be made public
         - [ ] Room owner can add other users to a blacklist
     - [ ] Rooms can be made private
       - [ ] Room owner can add other users to a whitelist
 - [ ] Secure redis so that it does not accept connections from other sources.
+- [ ] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
 
 ## References
 

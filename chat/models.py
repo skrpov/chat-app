@@ -14,6 +14,7 @@ class SavedRoom(models.Model):
 
 
 class Message(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     display_name = models.CharField(max_length=255)
     body = models.CharField(max_length=255)
