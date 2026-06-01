@@ -8,13 +8,17 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def messenger_view(request, room_name=None):
+def messenger_view(request, room_id=None):
     template = loader.get_template("messenger.html")
     messages = Message.objects.all().order_by("created_at")
+    rooms = Room.objects.filter(id=room_id)
+    room_name = rooms[0].name if len(rooms) > 0 else ""
     saved_rooms = SavedRoom.objects.filter(user=request.user).select_related("room")
+
     context = {
         "messages": messages,
         "username": request.user.username,
+        "room_id": room_id,
         "room_name": room_name,
         "saved_rooms": saved_rooms,
     }

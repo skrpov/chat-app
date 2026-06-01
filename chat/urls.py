@@ -5,5 +5,5 @@ urlpatterns = [
     path("rooms/create/", create_room_view, name="create_room"),
     path("rooms/join/", join_room_view, name="join_room"),
     path("", messenger_view, name="home"),
-    path("<str:room_name>/", messenger_view, name="room"),
+    path("<str:room_id>/", messenger_view, name="room"),
 ]
