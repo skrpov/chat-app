@@ -19,7 +19,7 @@ def messenger_view(request, room_id=None):
         "messages": messages,
         "user": request.user,
         "room": room,
-        "saved_rooms": saved_rooms,
+        "saved_rooms": sorted(saved_rooms, key=lambda sv: sv.room.name.lower()),
     }
     return HttpResponse(template.render(context, request))
 
