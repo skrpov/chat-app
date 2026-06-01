@@ -4,13 +4,43 @@ import logging
 from .models import Message, SavedRoom, Room
 from datetime import datetime
 
+# How many messages a single history block contains.
+BLOCK_SIZE = 50
 
-def make_packet(username: str, message: str, sent_at: datetime) -> dict[str, str]:
+
+def make_packet(
+    message_id: int, username: str, message: str, sent_at: datetime, total: int
+) -> dict:
     return {
         "type": "message",
+        "id": message_id,
         "username": username,
         "message": message,
         "sent_at": datetime.isoformat(sent_at),
+        "total": total,
+    }
+
+
+def make_message_item(message: Message) -> dict:
+    return {
+        "id": message.id,
+        "username": message.sender.get_username(),
+        "message": message.body,
+        "sent_at": datetime.isoformat(message.created_at),
+    }
+
+
+def make_history_packet(items: list[dict], total: int, offset: int) -> dict:
+    """A block of messages.
+
+    `offset` is the index (from the oldest message, 0-based) of `items[0]`; `items` are
+    in chronological (oldest-first) order. The client places the block at this offset.
+    """
+    return {
+        "type": "history",
+        "messages": items,
+        "total": total,
+        "offset": offset,
     }
 
 
@@ -25,22 +55,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {"type": "chat.message", "packet": packet},
         )
 
-    async def send_history(self):
-        promises = []
-        history = Message.objects.filter(room_id=self.room_id).select_related("sender")
-        async for message in history:
-            promises.append(
-                self.send_packet(
-                    make_packet(
-                        username=message.sender.get_username(),
-                        message=message.body,
-                        sent_at=message.created_at,
-                    )
-                )
-            )
+    def room_messages(self):
+        return Message.objects.filter(room_id=self.room_id).select_related("sender")
 
-        for promise in promises:
-            await promise
+    async def room_total(self) -> int:
+        return await self.room_messages().acount()
+
+    async def block_at(self, offset: int, count: int) -> list[dict]:
+        """`count` messages starting at `offset` from the oldest, chronological order."""
+        qs = self.room_messages().order_by("id")[offset : offset + count]
+        return [make_message_item(m) async for m in qs]
+
+    async def send_history_block(self, offset: int, count: int):
+        total = await self.room_total()
+        offset = max(0, min(offset, total))
+        items = await self.block_at(offset, count)
+        await self.send_packet(make_history_packet(items, total, offset))
+
+    async def send_latest_block(self):
+        total = await self.room_total()
+        start = max(0, total - BLOCK_SIZE)
+        await self.send_history_block(start, BLOCK_SIZE)
 
     async def connect(self):
 
@@ -71,7 +106,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         group_add_result = self.channel_layer.group_add(
             self.room_group_name, self.channel_name
         )
-        await self.send_history()
+        await self.send_latest_block()
         await group_add_result
 
     async def disconnect(self, code: int) -> None:
@@ -93,13 +128,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # TODO: Error handling?
         data = json.loads(text_data)
+        packet_type = data.get("type")
+
+        if packet_type == "send_message":
+            await self.handle_send_message(data)
+        elif packet_type == "get_history":
+            await self.handle_get_history(data)
+        else:
+            logging.warning("Unknown client packet type: %r", packet_type)
+
+    async def handle_send_message(self, data: dict):
         body = data["body"]
         display_name = data["display_name"]
         created_at = datetime.now()
 
-        # If we let the db add the send time then we have to block until the operation
-        # finishes. Instead we supply the time to the db so that it can save in the background,
-        # and we can still have synced times.
         message = Message(
             room_id=self.room_id,
             sender=self.user,
@@ -107,12 +149,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             body=body,
             created_at=created_at,
         )
-        save_result = message.asave()
+        # Await the save so the broadcast packet can carry the real db id (used as a
+        # pagination cursor) and an up-to-date room total.
+        await message.asave()
+        total = await self.room_total()
 
         await self.send_packet_to_group(
-            make_packet(username=display_name, message=body, sent_at=created_at)
+            make_packet(
+                message_id=message.id,
+                username=display_name,
+                message=body,
+                sent_at=created_at,
+                total=total,
+            )
         )
-        await save_result
+
+    async def handle_get_history(self, data: dict):
+        offset = int(data.get("offset", 0))
+        count = int(data.get("count", BLOCK_SIZE))
+        await self.send_history_block(offset, count)
 
     async def chat_message(self, event):
         await self.send_packet(event["packet"])

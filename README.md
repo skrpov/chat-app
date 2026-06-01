@@ -22,10 +22,11 @@ docker compose up --build
 ## Tasks 
 - [x] Make messages persist
 - [x] Make sure that the client is able to view room history, not just the newest messages
-    - [ ] Send only a most recent window of history, and send more on request.
+    - [x] Send only a most recent window of history, and send more on request.
 - [x] Dockerize the application and add running instructions
 - [ ] Ensure that on the client messages appear in the same order they were sent in
 - [x] Make messages send to all connections, not just the sender.
+- [ ] Add a placeholder for when a room has no messages
 - [x] Add authentication
     - [x] Add a way to signup
     - [x] Add a way to login
@@ -33,7 +34,7 @@ docker compose up --build
     - [x] Display logged in user name in chat UI
 - [x] Add rooms 
     - [x] No rooms yet placeholder
-    - [ ] Switching rooms closes the connection to current room before opening another
+    - [x] Switching rooms closes the connection to current room before opening another
     - [x] Adding a new room makes it correctly show up in the room list
     - [x] Selected room is highlighted in the room list
     - [x] Room list order is sorted
