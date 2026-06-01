@@ -30,9 +30,9 @@ docker compose up --build
     - [x] Add a way to signup
     - [x] Add a way to login
     - [x] Ensure that pages other then login and signup redirect on unauthenticated access
-    - [ ] Display logged in user name in chat UI
+    - [x] Display logged in user name in chat UI
 - [x] Add rooms 
-    - [ ] No rooms yet placeholder
+    - [x] No rooms yet placeholder
     - [ ] Switching rooms closes the connection to current room before opening another
     - [x] Adding a new room makes it correctly show up in the room list
     - [x] Selected room is highlighted in the room list

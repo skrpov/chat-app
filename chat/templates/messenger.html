@@ -6,6 +6,8 @@
     {% include "partials/rooms_sidebar.html" %}
     {% if room %}
       {% include "partials/chat_panel.html" %}
+    {% else %}
+      {% include "partials/no_group_placeholder.html" %}
     {% endif %}
   </div>
 </div>
@@ -106,7 +108,7 @@
   };
 
   window.onload = () => {
-    if (roomId !== undefined) {
+    if (roomId && roomId.length > 0) {
       openSocket(roomId);
     }
   };
