@@ -4,7 +4,7 @@
 <div class="container-fluid py-3" style="max-width: 1100px;">
   <div class="d-flex gap-3" style="height: calc(100vh - 40px);">
     {% include "partials/rooms_sidebar.html" %}
-    {% if room_id %}
+    {% if room %}
       {% include "partials/chat_panel.html" %}
     {% endif %}
   </div>
@@ -13,10 +13,10 @@
 {% endblock %}
 
 {% block scripts %}
-{{ room_id|json_script:"room-id-data" }}
+{{ room.id|json_script:"room-id-data" }}
 <script>
   const roomId = JSON.parse(document.getElementById('room-id-data').textContent) ?? undefined;
-  const userName = "{{ username }}";
+  const userName = "{{ user.username }}";
 
   let errorTimeout = null;
 

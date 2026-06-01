@@ -12,14 +12,13 @@ def messenger_view(request, room_id=None):
     template = loader.get_template("messenger.html")
     messages = Message.objects.all().order_by("created_at")
     rooms = Room.objects.filter(id=room_id)
-    room_name = rooms[0].name if len(rooms) > 0 else ""
+    room = rooms[0] if len(rooms) > 0 else None
     saved_rooms = SavedRoom.objects.filter(user=request.user).select_related("room")
 
     context = {
         "messages": messages,
-        "username": request.user.username,
-        "room_id": room_id,
-        "room_name": room_name,
+        "user": request.user,
+        "room": room,
         "saved_rooms": saved_rooms,
     }
     return HttpResponse(template.render(context, request))
