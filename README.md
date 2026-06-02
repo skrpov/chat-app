@@ -41,6 +41,8 @@ docker compose up --build
     - [x] Room list order is sorted
     - [x] Room settings are only visible to room owner
     - [x] Room name correctly shows up in the chat view
+    - [ ] Room name can be changed.
+    - [ ] Navigating to a room that isn't saved saves that room for the user.
 - [ ] Add room permissions
     - [x] Owners can own a room
     - [ ] Rooms can be made public
@@ -48,7 +50,17 @@ docker compose up --build
     - [ ] Rooms can be made private
       - [ ] Room owner can add other users to a whitelist
 - [ ] Secure redis so that it does not accept connections from other sources.
-- [ ] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
+- [x] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
+- [ ] Add hamburger menu for group list page s.t. the chat is more usable on mobile.
+- [ ] Add a landing page instead of just redirecting to login page right off the bat.
+- [ ] Add some kind of message encryption / hashing
+- [ ] Add a "delievered" indicator
+- [ ] Add a "read" indicator
+- [ ] Host the messenger on the WWW
+- [ ] Only new message send time when the time is significantly different
+- [ ] Dark mode / Global styles
+- [ ] Some kind of spam protection
+
 
 ## References
 
