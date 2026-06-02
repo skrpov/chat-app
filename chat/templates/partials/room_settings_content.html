@@ -1,0 +1,96 @@
+<div class="mb-4">
+  <div class="fw-semibold mb-2">Visibility</div>
+  <form hx-post="{% url 'room_settings' room_id=room.id %}"
+        hx-target="#roomSettingsModal .modal-body"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="set_visibility">
+    <div class="d-flex gap-3 mb-2">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="visibility" value="public"
+               id="vis-public" {% if room.visibility == 'public' %}checked{% endif %}>
+        <label class="form-check-label" for="vis-public">Public</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="visibility" value="private"
+               id="vis-private" {% if room.visibility == 'private' %}checked{% endif %}>
+        <label class="form-check-label" for="vis-private">Private</label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+  </form>
+</div>
+
+<hr>
+
+<div class="mb-4">
+  <div class="fw-semibold mb-2">Whitelist</div>
+  <form hx-post="{% url 'room_settings' room_id=room.id %}"
+        hx-target="#roomSettingsModal .modal-body"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_member">
+    <input type="hidden" name="status" value="whitelist">
+    <div class="input-group input-group-sm mb-1">
+      <input type="text" name="username"
+             class="form-control{% if errors.whitelist_username %} is-invalid{% endif %}"
+             placeholder="Username">
+      <button class="btn btn-outline-primary" type="submit">Add</button>
+      {% if errors.whitelist_username %}
+        <div class="invalid-feedback">{{ errors.whitelist_username }}</div>
+      {% endif %}
+    </div>
+  </form>
+  {% for member in whitelist %}
+    <div class="d-flex align-items-center justify-content-between py-1 border-bottom">
+      <span class="small">{{ member.user.username }}</span>
+      <form hx-post="{% url 'room_settings' room_id=room.id %}"
+            hx-target="#roomSettingsModal .modal-body"
+            hx-swap="innerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_member">
+        <input type="hidden" name="username" value="{{ member.user.username }}">
+        <button class="btn btn-sm btn-outline-danger py-0 px-2" type="submit">Remove</button>
+      </form>
+    </div>
+  {% empty %}
+    <div class="text-muted small">No users on the whitelist.</div>
+  {% endfor %}
+</div>
+
+<hr>
+
+<div class="mb-2">
+  <div class="fw-semibold mb-2">Blacklist</div>
+  <form hx-post="{% url 'room_settings' room_id=room.id %}"
+        hx-target="#roomSettingsModal .modal-body"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_member">
+    <input type="hidden" name="status" value="blacklist">
+    <div class="input-group input-group-sm mb-1">
+      <input type="text" name="username"
+             class="form-control{% if errors.blacklist_username %} is-invalid{% endif %}"
+             placeholder="Username">
+      <button class="btn btn-outline-danger" type="submit">Add</button>
+      {% if errors.blacklist_username %}
+        <div class="invalid-feedback">{{ errors.blacklist_username }}</div>
+      {% endif %}
+    </div>
+  </form>
+  {% for member in blacklist %}
+    <div class="d-flex align-items-center justify-content-between py-1 border-bottom">
+      <span class="small">{{ member.user.username }}</span>
+      <form hx-post="{% url 'room_settings' room_id=room.id %}"
+            hx-target="#roomSettingsModal .modal-body"
+            hx-swap="innerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_member">
+        <input type="hidden" name="username" value="{{ member.user.username }}">
+        <button class="btn btn-sm btn-outline-danger py-0 px-2" type="submit">Remove</button>
+      </form>
+    </div>
+  {% empty %}
+    <div class="text-muted small">No users on the blacklist.</div>
+  {% endfor %}
+</div>

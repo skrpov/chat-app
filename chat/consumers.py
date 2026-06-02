@@ -94,11 +94,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.room_group_name = f"chat_{self.room_id}"
 
-        is_saved_and_exists = await SavedRoom.objects.filter(
-            user=self.user, room_id=self.room_id
-        ).aexists()
-
-        if not is_saved_and_exists:
+        room = await Room.objects.filter(id=self.room_id).afirst()
+        if room is None or not await room.acan_access(self.user):
             await self.close()
             return
 

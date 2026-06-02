@@ -5,10 +5,11 @@
       <span>{{ room.name }} </span>
 
       {% if user == room.owner %}
-        <button class="btn btn-sm btn-outline-secondary" title="Room settings">
+        <button class="btn btn-sm btn-outline-secondary"
+                data-bs-toggle="modal" data-bs-target="#roomSettingsModal"
+                title="Room settings">
           <i class="fa-solid fa-gear"></i> Room settings
         </button>
-      {% else %}
       {% endif %}
 
     </div>

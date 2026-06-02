@@ -12,4 +12,7 @@
   </div>
 </div>
 {% include "partials/add_room_modal.html" %}
+{% if room and user == room.owner %}
+  {% include "partials/room_settings_modal.html" %}
+{% endif %}
 {% endblock %}
