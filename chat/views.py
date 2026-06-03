@@ -25,6 +25,7 @@ def messenger_view(request, room_id=None):
         candidate = Room.objects.filter(id=room_id).first()
         if candidate and candidate.can_access(request.user):
             room = candidate
+            SavedRoom.objects.get_or_create(room=room, user=request.user)
 
     messages = Message.objects.all().order_by("created_at")
     saved_rooms = SavedRoom.objects.filter(user=request.user).select_related("room")
@@ -48,6 +49,7 @@ def _redirect_to_room(room_id):
 def create_room_view(request):
     name = request.POST.get("name", "").strip()
     room_id = request.POST.get("room_id", "").strip()
+    visibility = request.POST.get("visibility", "").strip()
 
     errors = {}
     if not name:
@@ -58,15 +60,17 @@ def create_room_view(request):
         errors["room_id"] = "Use only lowercase letters, numbers and hyphens."
     elif Room.objects.filter(id=room_id).exists():
         errors["room_id"] = "That room ID is already taken."
+    if visibility not in (Room.PUBLIC, Room.PRIVATE):
+        errors["visibility"] = "Please select a visibility."
 
     if errors:
         return render(
             request,
             "partials/create_room_form.html",
-            {"errors": errors, "values": {"name": name, "room_id": room_id}},
+            {"errors": errors, "values": {"name": name, "room_id": room_id, "visibility": visibility}},
         )
 
-    room = Room.objects.create(id=room_id, owner=request.user, name=name)
+    room = Room.objects.create(id=room_id, owner=request.user, name=name, visibility=visibility)
     SavedRoom.objects.create(room=room, user=request.user)
     return _redirect_to_room(room.id)
 
