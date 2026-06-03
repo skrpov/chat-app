@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
+from .crypto import decrypt, encrypt
 from .models import Message, Room, RoomJoinRecord, SavedRoom
 from datetime import datetime
 
@@ -27,7 +28,7 @@ def make_message_item(message: Message) -> dict:
     return {
         "id": message.id,
         "username": message.sender.get_username(),
-        "message": message.body,
+        "message": decrypt(message.body) if message.kind == Message.CHAT else message.body,
         "sent_at": datetime.isoformat(message.created_at),
         "kind": message.kind,
     }
@@ -177,7 +178,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             room_id=self.room_id,
             sender=self.user,
             display_name=display_name,
-            body=body,
+            body=encrypt(body),
             created_at=created_at,
         )
         # Await the save so the broadcast packet can carry the real db id (used as a

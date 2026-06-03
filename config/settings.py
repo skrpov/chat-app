@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,6 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-90(ocqt_1od+cx^=gq6o)2zad$l^j!d2qzjt8e#ej41!hx9%@5"
+
+# SECURITY WARNING: replace with a real key in production (Fernet.generate_key())
+FERNET_KEY = os.environ.get("FERNET_KEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -46,10 +50,11 @@ INSTALLED_APPS = [
 ]
 
 ASGI_APPLICATION = "config.asgi.application"
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", "")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("redis", 6379)]},
+        "CONFIG": {"hosts": [f"redis://:{REDIS_PASSWORD}@redis:6379"]},
     }
 }
 
