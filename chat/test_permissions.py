@@ -116,6 +116,46 @@ class TestJoinRoomViewPermissions(TestCase):
         add_member(room, self.alice, RoomMember.BLACKLIST)
         self.assertContains(self._join("general"), "No room found with that ID")
 
+    def test_joining_saves_room(self):
+        make_room(self.owner, "general")
+        self._join("general")
+        self.assertTrue(SavedRoom.objects.filter(room_id="general", user=self.alice).exists())
+
+    def test_navigating_to_room_saves_it(self):
+        make_room(self.owner, "general")
+        self.client.get("/general/")
+        self.assertTrue(SavedRoom.objects.filter(room_id="general", user=self.alice).exists())
+
+    def test_navigating_to_private_room_without_whitelist_does_not_save(self):
+        make_room(self.owner, "secret", visibility=Room.PRIVATE)
+        self.client.get("/secret/")
+        self.assertFalse(SavedRoom.objects.filter(room_id="secret", user=self.alice).exists())
+
+    def test_navigating_to_room_while_blacklisted_does_not_save(self):
+        room = make_room(self.owner, "general")
+        add_member(room, self.alice, RoomMember.BLACKLIST)
+        self.client.get("/general/")
+        self.assertFalse(SavedRoom.objects.filter(room_id="general", user=self.alice).exists())
+
+
+# ---------------------------------------------------------------------------
+# create_room_view tests
+# ---------------------------------------------------------------------------
+
+
+class TestCreateRoomView(TestCase):
+    def setUp(self):
+        self.owner = make_user("owner")
+        self.client.force_login(self.owner)
+
+    def _create(self, name, room_id, **extra):
+        return self.client.post("/rooms/create/", {"name": name, "room_id": room_id, **extra})
+
+    def test_create_room_requires_explicit_visibility(self):
+        response = self._create("General", "general")
+        self.assertContains(response, "Please select a visibility.")
+        self.assertFalse(Room.objects.filter(id="general").exists())
+
 
 # ---------------------------------------------------------------------------
 # room_settings_view tests
