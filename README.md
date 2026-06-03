@@ -24,7 +24,7 @@ docker compose up --build
 - [x] Make sure that the client is able to view room history, not just the newest messages
     - [x] Send only a most recent window of history, and send more on request.
 - [x] Dockerize the application and add running instructions
-- [ ] Ensure that on the client messages appear in the same order they were sent in
+- [x] Ensure that on the client messages appear in the same order they were sent in
 - [x] Make messages send to all connections, not just the sender.
 - [x] Add a placeholder for when a room has no messages
 - [ ] Add join notification message
@@ -42,13 +42,14 @@ docker compose up --build
     - [x] Room settings are only visible to room owner
     - [x] Room name correctly shows up in the chat view
     - [ ] Room name can be changed.
-    - [ ] Navigating to a room that isn't saved saves that room for the user.
-- [ ] Add room permissions
+    - [x] Navigating to a room that isn't saved saves that room for the user.
+    - [ ] User can un-save a room
+- [x] Add room permissions
     - [x] Owners can own a room
-    - [ ] Rooms can be made public
-        - [ ] Room owner can add other users to a blacklist
-    - [ ] Rooms can be made private
-      - [ ] Room owner can add other users to a whitelist
+    - [x] Rooms can be made public
+        - [x] Room owner can add other users to a blacklist
+    - [x] Rooms can be made private
+      - [x] Room owner can add other users to a whitelist
 - [ ] Secure redis so that it does not accept connections from other sources.
 - [x] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
 - [ ] Add hamburger menu for group list page s.t. the chat is more usable on mobile.

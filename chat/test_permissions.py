@@ -48,6 +48,21 @@ def async_add_member(room, user, status):
     return add_member(room, user, status)
 
 
+@database_sync_to_async
+def async_create_join_record(room, user):
+    from .models import RoomJoinRecord
+    RoomJoinRecord.objects.get_or_create(room=room, user=user)
+
+
+@database_sync_to_async
+def async_make_returning_user(username, room):
+    """Create a user who has already visited this room (no first-join notification fires)."""
+    from .models import RoomJoinRecord
+    user = make_user(username)
+    RoomJoinRecord.objects.get_or_create(room=room, user=user)
+    return user
+
+
 # ---------------------------------------------------------------------------
 # Room.can_access unit tests
 # ---------------------------------------------------------------------------
@@ -303,8 +318,8 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     async def test_blacklisted_user_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
-        alice = await async_make_user("alice")
-        await async_make_room(owner, "general")
+        room = await async_make_room(owner, "general")
+        alice = await async_make_returning_user("alice", room)
         async with self.joined(alice, "general") as (comm, connected, _):
             self.assertTrue(connected)
             await self._kick(alice.pk, "general")
@@ -312,8 +327,8 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     async def test_whitelist_removal_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
-        alice = await async_make_user("alice")
         room = await async_make_room(owner, "secret", visibility=Room.PRIVATE)
+        alice = await async_make_returning_user("alice", room)
         await async_add_member(room, alice, RoomMember.WHITELIST)
         async with self.joined(alice, "secret") as (comm, connected, _):
             self.assertTrue(connected)
@@ -322,8 +337,8 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     async def test_visibility_flip_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
-        alice = await async_make_user("alice")
-        await async_make_room(owner, "general")
+        room = await async_make_room(owner, "general")
+        alice = await async_make_returning_user("alice", room)
         async with self.joined(alice, "general") as (comm, connected, _):
             self.assertTrue(connected)
             await self._kick(alice.pk, "general")
@@ -333,13 +348,13 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     async def test_kicked_user_cannot_broadcast_messages(self):
         owner = await async_make_user("owner")
-        alice = await async_make_user("alice")
-        bob = await async_make_user("bob")
-        await async_make_room(owner, "general")
+        room = await async_make_room(owner, "general")
+        alice = await async_make_returning_user("alice", room)
+        bob = await async_make_returning_user("bob", room)
         async with self.joined(alice, "general") as (alice_comm, _, _), \
                 self.joined(bob, "general") as (bob_comm, _, _):
             await self._kick(alice.pk, "general")
-            await self._assert_kicked(alice_comm)  # drain kicked + close
+            await self._assert_kicked(alice_comm)
             await alice_comm.send_json_to(
                 {"type": "send_message", "display_name": "alice", "body": "ghost"}
             )
@@ -349,12 +364,119 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     async def test_kick_does_not_affect_other_room_connections(self):
         owner = await async_make_user("owner")
-        alice = await async_make_user("alice")
-        await async_make_room(owner, "room-a")
-        await async_make_room(owner, "room-b")
+        room_a = await async_make_room(owner, "room-a")
+        room_b = await async_make_room(owner, "room-b")
+        alice = await async_make_returning_user("alice", room_a)
+        await async_create_join_record(room_b, alice)
         async with self.joined(alice, "room-a") as (room_a_comm, _, _), \
                 self.joined(alice, "room-b") as (room_b_comm, connected_b, _):
             self.assertTrue(connected_b)
             await self._kick(alice.pk, "room-a")
             await self._assert_kicked(room_a_comm)
             self.assertTrue(await room_b_comm.receive_nothing(timeout=0.5))
+
+
+# ---------------------------------------------------------------------------
+# Join notification tests
+#
+# These test the join notification feature:
+#   - A RoomJoinRecord tracks each user's first-ever connection per room
+#   - On first connect, a Message(kind=join) is persisted and broadcast to the room group
+#     as a regular {"type": "message", "kind": "join", ...} packet
+# ---------------------------------------------------------------------------
+
+
+@_IN_MEMORY_CHANNELS
+class ChatConsumerJoinNotificationTests(TransactionTestCase):
+
+    async def _connect(self, user, room_id):
+        comm = WebsocketCommunicator(
+            URLRouter(websocket_urlpatterns), f"/ws/chat/{room_id}/"
+        )
+        comm.scope["user"] = user  # type: ignore
+        connected, _ = await comm.connect()
+        return comm, connected
+
+    # --- first join fires notification ---
+
+    async def test_first_join_sends_notification_to_joining_user(self):
+        owner = await async_make_user("owner")
+        alice = await async_make_user("alice")
+        await async_make_room(owner, "general")
+        comm, connected = await self._connect(alice, "general")
+        self.assertTrue(connected)
+        try:
+            await comm.receive_json_from()  # history
+            notification = await comm.receive_json_from()
+            self.assertEqual(notification["type"], "message")
+            self.assertEqual(notification["kind"], "join")
+            self.assertEqual(notification["username"], "alice")
+        finally:
+            await comm.disconnect()
+
+    async def test_first_join_notifies_already_connected_users(self):
+        owner = await async_make_user("owner")
+        room = await async_make_room(owner, "general")
+        alice = await async_make_user("alice")
+        bob = await async_make_returning_user("bob", room)
+        bob_comm, _ = await self._connect(bob, "general")
+        await bob_comm.receive_json_from()  # bob's history
+        try:
+            alice_comm, _ = await self._connect(alice, "general")
+            await alice_comm.receive_json_from()  # alice's history
+            await alice_comm.receive_json_from()  # alice's own notification
+            try:
+                notification = await bob_comm.receive_json_from()
+                self.assertEqual(notification["type"], "message")
+                self.assertEqual(notification["kind"], "join")
+                self.assertEqual(notification["username"], "alice")
+            finally:
+                await alice_comm.disconnect()
+        finally:
+            await bob_comm.disconnect()
+
+    async def test_owner_first_connect_sends_notification(self):
+        owner = await async_make_user("owner")
+        await async_make_room(owner, "general")
+        comm, connected = await self._connect(owner, "general")
+        self.assertTrue(connected)
+        try:
+            await comm.receive_json_from()  # history
+            notification = await comm.receive_json_from()
+            self.assertEqual(notification["type"], "message")
+            self.assertEqual(notification["kind"], "join")
+            self.assertEqual(notification["username"], "owner")
+        finally:
+            await comm.disconnect()
+
+    # --- repeat joins do not fire notification ---
+
+    async def test_reconnect_does_not_send_notification(self):
+        owner = await async_make_user("owner")
+        alice = await async_make_user("alice")
+        await async_make_room(owner, "general")
+        comm1, _ = await self._connect(alice, "general")
+        await comm1.receive_json_from()  # history
+        await comm1.receive_json_from()  # join notification
+        await comm1.disconnect()
+
+        comm2, connected = await self._connect(alice, "general")
+        self.assertTrue(connected)
+        try:
+            await comm2.receive_json_from()  # history
+            self.assertTrue(await comm2.receive_nothing(timeout=0.1))
+        finally:
+            await comm2.disconnect()
+
+    async def test_ban_unban_rejoin_does_not_send_notification(self):
+        owner = await async_make_user("owner")
+        room = await async_make_room(owner, "general")
+        alice = await async_make_returning_user("alice", room)
+        # alice has a prior join record (persists through ban/unban) but no SavedRoom
+        comm, connected = await self._connect(alice, "general")
+        self.assertTrue(connected)
+        try:
+            await comm.receive_json_from()  # history
+            self.assertTrue(await comm.receive_nothing(timeout=0.1))
+        finally:
+            await comm.disconnect()

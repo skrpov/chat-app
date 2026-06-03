@@ -8,6 +8,14 @@ const EST_ROW = 64;
 const NEAR_BOTTOM_PX = 150;
 
 function renderMessageNode(data, userName) {
+  if (data.kind === "join") {
+    const el = document.createElement("div");
+    el.className = "text-center text-muted small py-2";
+    el.dataset.id = data.id;
+    el.innerHTML = `<i class="fa-solid fa-right-to-bracket me-1 opacity-75"></i> ${data.username} joined`;
+    return el;
+  }
+
   const own = data.username === userName;
   const wrapper = document.createElement("div");
   wrapper.className = `d-flex mb-1 ${own ? "justify-content-end" : "justify-content-start"}`;

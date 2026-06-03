@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
-from .models import Message, SavedRoom, Room
+from .models import Message, Room, RoomJoinRecord, SavedRoom
 from datetime import datetime
 
 # How many messages a single history block contains.
@@ -9,7 +9,8 @@ BLOCK_SIZE = 50
 
 
 def make_packet(
-    message_id: int, username: str, message: str, sent_at: datetime, total: int
+    message_id: int, username: str, message: str, sent_at: datetime, total: int,
+    kind: str = Message.CHAT,
 ) -> dict:
     return {
         "type": "message",
@@ -18,6 +19,7 @@ def make_packet(
         "message": message,
         "sent_at": datetime.isoformat(sent_at),
         "total": total,
+        "kind": kind,
     }
 
 
@@ -27,6 +29,7 @@ def make_message_item(message: Message) -> dict:
         "username": message.sender.get_username(),
         "message": message.body,
         "sent_at": datetime.isoformat(message.created_at),
+        "kind": message.kind,
     }
 
 
@@ -106,6 +109,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send_latest_block()
         await room_group_add
         await user_room_group_add
+
+        _, is_first_join = await RoomJoinRecord.objects.aget_or_create(
+            room_id=self.room_id, user=self.user
+        )
+        if is_first_join:
+            created_at = datetime.now()
+            join_msg = Message(
+                room_id=self.room_id,
+                sender=self.user,
+                display_name=self.user.get_username(),
+                body="",
+                kind=Message.JOIN,
+                created_at=created_at,
+            )
+            await join_msg.asave()
+            total = await self.room_total()
+            await self.send_packet_to_group(
+                make_packet(
+                    message_id=join_msg.id,
+                    username=self.user.get_username(),
+                    message="",
+                    sent_at=created_at,
+                    total=total,
+                    kind=Message.JOIN,
+                )
+            )
 
     async def disconnect(self, code: int) -> None:
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)

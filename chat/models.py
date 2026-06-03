@@ -40,14 +40,28 @@ class RoomMember(models.Model):
         unique_together = ("room", "user")
 
 
+class RoomJoinRecord(models.Model):
+    """Persists across bans to prevent re-triggering first-join notifications."""
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("room", "user")
+
+
 class SavedRoom(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 class Message(models.Model):
+    CHAT = "chat"
+    JOIN = "join"
+    KIND_CHOICES = [(CHAT, "Chat"), (JOIN, "Join")]
+
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     display_name = models.CharField(max_length=255)
-    body = models.CharField(max_length=255)
+    body = models.CharField(max_length=255, blank=True)
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=CHAT)
     created_at = models.DateTimeField(auto_now_add=True)

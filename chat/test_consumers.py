@@ -21,15 +21,14 @@ def create_user(username):
 
 @database_sync_to_async
 def save_room(user, room_id):
-    """Create the room (if needed) and save it for the user.
-
-    ChatConsumer.connect rejects users who have not saved the room, so this is the
-    precondition for a successful connection.
-    """
+    """Create the room (if needed), save it for the user, and mark the user as a
+    returning member so join notifications don't fire during unrelated tests."""
+    from .models import RoomJoinRecord
     room, _ = Room.objects.get_or_create(
         id=room_id, defaults={"owner": user, "name": room_id}
     )
     SavedRoom.objects.get_or_create(user=user, room=room)
+    RoomJoinRecord.objects.get_or_create(user=user, room=room)
     return room
 
 
