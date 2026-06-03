@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Messenger{% endblock %}
+
+{% block content %}
+<nav class="navbar bg-white border-bottom px-3 px-md-5">
+  <span class="navbar-brand fw-bold fs-5">
+    <i class="fa-solid fa-comments text-primary me-2"></i>Messenger
+  </span>
+  <div class="d-flex gap-2">
+    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Sign in</a>
+    <a href="/accounts/signup/" class="btn btn-primary btn-sm">Get started</a>
+  </div>
+</nav>
+
+<div class="py-5 text-center border-bottom">
+  <div class="container" style="max-width: 680px;">
+    <div class="mb-4">
+      <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 5rem; height: 5rem;">
+        <i class="fa-solid fa-comments" style="font-size: 2rem;"></i>
+      </span>
+    </div>
+    <h1 class="fw-bold mb-3" style="font-size: 2.75rem; line-height: 1.15;">Chat freely.</h1>
+    <p class="lead text-muted mb-4" style="max-width: 480px; margin: 0 auto 1.5rem;">
+      Real-time group chat with public and private rooms, instant delivery, and simple member controls.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="/accounts/signup/" class="btn btn-primary btn-lg px-4">Get started</a>
+      <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5" style="max-width: 900px;">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <div class="mb-3">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 3rem; height: 3rem;">
+            <i class="fa-solid fa-bolt"></i>
+          </span>
+        </div>
+        <h6 class="fw-semibold mb-2">Real-time</h6>
+        <p class="text-muted small mb-0">Messages delivered instantly via WebSockets — no refresh needed.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <div class="mb-3">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 3rem; height: 3rem;">
+            <i class="fa-solid fa-lock"></i>
+          </span>
+        </div>
+        <h6 class="fw-semibold mb-2">Public &amp; private rooms</h6>
+        <p class="text-muted small mb-0">Keep conversations open or lock them down with a whitelist.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <div class="mb-3">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 3rem; height: 3rem;">
+            <i class="fa-solid fa-users"></i>
+          </span>
+        </div>
+        <h6 class="fw-semibold mb-2">Group chat</h6>
+        <p class="text-muted small mb-0">Multiple rooms, each with their own history and member controls.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

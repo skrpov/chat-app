@@ -138,18 +138,18 @@ class TestJoinRoomViewPermissions(TestCase):
 
     def test_navigating_to_room_saves_it(self):
         make_room(self.owner, "general")
-        self.client.get("/general/")
+        self.client.get("/app/general/")
         self.assertTrue(SavedRoom.objects.filter(room_id="general", user=self.alice).exists())
 
     def test_navigating_to_private_room_without_whitelist_does_not_save(self):
         make_room(self.owner, "secret", visibility=Room.PRIVATE)
-        self.client.get("/secret/")
+        self.client.get("/app/secret/")
         self.assertFalse(SavedRoom.objects.filter(room_id="secret", user=self.alice).exists())
 
     def test_navigating_to_room_while_blacklisted_does_not_save(self):
         room = make_room(self.owner, "general")
         add_member(room, self.alice, RoomMember.BLACKLIST)
-        self.client.get("/general/")
+        self.client.get("/app/general/")
         self.assertFalse(SavedRoom.objects.filter(room_id="general", user=self.alice).exists())
 
 
@@ -188,7 +188,7 @@ class TestRoomSettingsView(TestCase):
     def _post(self, data, user=None):
         if user:
             self.client.force_login(user)
-        return self.client.post("/general/settings/", data)
+        return self.client.post("/app/general/settings/", data)
 
     def test_non_owner_gets_404(self):
         self.assertEqual(self._post({}, user=self.alice).status_code, 404)

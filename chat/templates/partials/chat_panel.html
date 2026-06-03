@@ -22,7 +22,9 @@
       class="form-control"
       placeholder="Type a message…"
     />
-    <button id="send-button" class="btn btn-primary">Send</button>
+    <button id="send-button" class="btn btn-primary px-3" title="Send">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
   </div>
 </div>
 {{ room.id|json_script:"room-id-data" }}

@@ -1,7 +1,11 @@
 <div class="card d-flex flex-column" style="width: 220px; min-width: 220px;">
-  <div class="card-header fw-semibold d-flex align-items-center" style="height: 3rem;">Rooms</div>
+  <div class="card-header fw-bold d-flex align-items-center" style="height: 3rem;">
+    <i class="fa-solid fa-comments text-primary me-2"></i>Messenger
+  </div>
   <div class="p-2 d-flex flex-column gap-1 overflow-y-auto flex-grow-1">
-    <button type="button" class="btn btn-sm my-1 p-2 btn-outline-primary rounded w-100 text-start" data-bs-toggle="modal" data-bs-target="#addRoomModal">+ Add Room</button>
+    <button type="button" class="btn btn-sm my-1 p-2 btn-primary rounded w-100 text-start" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+      <i class="fa-solid fa-plus me-1"></i> Add Room
+    </button>
     {% for saved_room in saved_rooms %}
       <a href="{% url 'room' room_id=saved_room.room.id %}" 
          class="btn btn-sm my-1 p-2 

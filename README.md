@@ -27,7 +27,7 @@ docker compose up --build
 - [x] Ensure that on the client messages appear in the same order they were sent in
 - [x] Make messages send to all connections, not just the sender.
 - [x] Add a placeholder for when a room has no messages
-- [ ] Add join notification message
+- [x] Add join notification message
 - [x] Add authentication
     - [x] Add a way to signup
     - [x] Add a way to login

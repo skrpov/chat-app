@@ -25,12 +25,13 @@ function renderMessageNode(data, userName) {
   container.style.maxWidth = "75%";
   container.style.minWidth = "12rem";
   container.className = "pt-2";
+  const bubbleCls = own ? "bg-primary text-white border-0" : "bg-light border";
   container.innerHTML = `
     <div class="d-flex justify-content-between align-items-baseline gap-3">
       <span class="small text-muted fw-semibold">${data.username}</span>
       <span class="text-muted" style="font-size: 0.7rem">${new Date(data.sent_at).toLocaleTimeString()}</span>
     </div>
-    <div class="px-2 py-1 border bg-light" style="border-radius: 0.5rem; width: 100%;">${data.message}</div>
+    <div class="px-2 py-1 ${bubbleCls}" style="border-radius: 0.5rem; width: 100%;">${data.message}</div>
     ${own ? `<div class="text-end text-muted" style="font-size: 0.65rem">Delivered</div>` : ""}
   `;
   wrapper.appendChild(container);

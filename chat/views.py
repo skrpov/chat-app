@@ -3,11 +3,18 @@ from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 from django.views.decorators.http import require_POST, require_http_methods
 from .models import Message, Room, RoomMember, SavedRoom
+
+
+def landing_view(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+    return render(request, "landing.html")
 
 
 def _kick_user(user_id, room_id):
@@ -40,8 +47,8 @@ def messenger_view(request, room_id=None):
 
 
 def _redirect_to_room(room_id):
-    """htmx client-side navigation to the given room page."""
-    return HttpResponse(status=204, headers={"HX-Redirect": f"/{room_id}/"})
+    url = reverse("room", kwargs={"room_id": room_id})
+    return HttpResponse(status=204, headers={"HX-Redirect": url})
 
 
 @login_required
