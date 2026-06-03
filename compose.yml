@@ -15,6 +15,8 @@ services:
     depends_on:
       - redis
     environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
       - FERNET_KEY=${FERNET_KEY}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:

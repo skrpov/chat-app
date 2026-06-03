@@ -21,13 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-90(ocqt_1od+cx^=gq6o)2zad$l^j!d2qzjt8e#ej41!hx9%@5"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-dev-only-replace-in-production")
 
 # SECURITY WARNING: replace with a real key in production (Fernet.generate_key())
 FERNET_KEY = os.environ.get("FERNET_KEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 LOGIN_REDIRECT_URL = "home"
