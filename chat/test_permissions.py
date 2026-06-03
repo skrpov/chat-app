@@ -7,6 +7,10 @@ from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
 from django.test import TestCase, TransactionTestCase, override_settings
 
+_IN_MEMORY_CHANNELS = override_settings(
+    CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+)
+
 from .models import Room, RoomMember, SavedRoom
 from .routing import websocket_urlpatterns
 
@@ -118,6 +122,7 @@ class TestJoinRoomViewPermissions(TestCase):
 # ---------------------------------------------------------------------------
 
 
+@_IN_MEMORY_CHANNELS
 class TestRoomSettingsView(TestCase):
     def setUp(self):
         self.owner = make_user("owner")
@@ -249,6 +254,13 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
 
     # --- kick: connection closed with prior notification ---
 
+    async def _assert_kicked(self, comm):
+        """Assert the consumer sent a kicked packet followed by a close frame."""
+        packet = await comm.receive_json_from()
+        self.assertEqual(packet["type"], "kicked")
+        close = await comm.receive_output()
+        self.assertEqual(close["type"], "websocket.close")
+
     async def test_blacklisted_user_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
         alice = await async_make_user("alice")
@@ -256,9 +268,7 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
         async with self.joined(alice, "general") as (comm, connected, _):
             self.assertTrue(connected)
             await self._kick(alice.pk, "general")
-            packet = await comm.receive_json_from()
-            self.assertEqual(packet["type"], "kicked")
-            self.assertTrue(await comm.receive_nothing(timeout=0.5))
+            await self._assert_kicked(comm)
 
     async def test_whitelist_removal_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
@@ -268,9 +278,7 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
         async with self.joined(alice, "secret") as (comm, connected, _):
             self.assertTrue(connected)
             await self._kick(alice.pk, "secret")
-            packet = await comm.receive_json_from()
-            self.assertEqual(packet["type"], "kicked")
-            self.assertTrue(await comm.receive_nothing(timeout=0.5))
+            await self._assert_kicked(comm)
 
     async def test_visibility_flip_receives_kicked_packet_then_disconnects(self):
         owner = await async_make_user("owner")
@@ -279,9 +287,7 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
         async with self.joined(alice, "general") as (comm, connected, _):
             self.assertTrue(connected)
             await self._kick(alice.pk, "general")
-            packet = await comm.receive_json_from()
-            self.assertEqual(packet["type"], "kicked")
-            self.assertTrue(await comm.receive_nothing(timeout=0.5))
+            await self._assert_kicked(comm)
 
     # --- kick: evicted user cannot send ---
 
@@ -293,7 +299,7 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
         async with self.joined(alice, "general") as (alice_comm, _, _), \
                 self.joined(bob, "general") as (bob_comm, _, _):
             await self._kick(alice.pk, "general")
-            await alice_comm.receive_json_from()  # drain kicked packet
+            await self._assert_kicked(alice_comm)  # drain kicked + close
             await alice_comm.send_json_to(
                 {"type": "send_message", "display_name": "alice", "body": "ghost"}
             )
@@ -310,6 +316,5 @@ class ChatConsumerPermissionsTests(TransactionTestCase):
                 self.joined(alice, "room-b") as (room_b_comm, connected_b, _):
             self.assertTrue(connected_b)
             await self._kick(alice.pk, "room-a")
-            packet = await room_a_comm.receive_json_from()
-            self.assertEqual(packet["type"], "kicked")
+            await self._assert_kicked(room_a_comm)
             self.assertTrue(await room_b_comm.receive_nothing(timeout=0.5))

@@ -93,6 +93,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         assert "url_route" in self.scope
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.room_group_name = f"chat_{self.room_id}"
+        self.user_room_group_name = f"user_{self.user.pk}_room_{self.room_id}"
 
         room = await Room.objects.filter(id=self.room_id).afirst()
         if room is None or not await room.acan_access(self.user):
@@ -100,17 +101,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         await self.accept()
-        group_add_result = self.channel_layer.group_add(
-            self.room_group_name, self.channel_name
-        )
+        room_group_add = self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        user_room_group_add = self.channel_layer.group_add(self.user_room_group_name, self.channel_name)
         await self.send_latest_block()
-        await group_add_result
+        await room_group_add
+        await user_room_group_add
 
     async def disconnect(self, code: int) -> None:
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        if hasattr(self, "user_room_group_name"):
+            await self.channel_layer.group_discard(self.user_room_group_name, self.channel_name)
         return await super().disconnect(code)
 
     async def receive(self, text_data=None, bytes_data=None):
+        if getattr(self, "_kicked", False):
+            return
         if bytes_data:
             preview = bytes_data[:128]
             logging.warning(
@@ -168,3 +173,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         await self.send_packet(event["packet"])
+
+    async def kick_user(self, event):
+        self._kicked = True
+        await self.send_packet({"type": "kicked"})
+        await self.close()

@@ -1,11 +1,20 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_POST, require_http_methods
 from .models import Message, Room, RoomMember, SavedRoom
-from django.contrib.auth.decorators import login_required
+
+
+def _kick_user(user_id, room_id):
+    async_to_sync(get_channel_layer().group_send)(
+        f"user_{user_id}_room_{room_id}",
+        {"type": "kick.user"},
+    )
 
 
 @login_required
@@ -105,9 +114,13 @@ def room_settings_view(request, room_id):
                     whitelisted_ids = RoomMember.objects.filter(
                         room=room, status=RoomMember.WHITELIST
                     ).values_list("user_id", flat=True)
-                    SavedRoom.objects.filter(room=room).exclude(
+                    to_evict = SavedRoom.objects.filter(room=room).exclude(
                         user=room.owner
-                    ).exclude(user_id__in=whitelisted_ids).delete()
+                    ).exclude(user_id__in=whitelisted_ids)
+                    evicted_ids = list(to_evict.values_list("user_id", flat=True))
+                    to_evict.delete()
+                    for uid in evicted_ids:
+                        _kick_user(uid, room.id)
 
         elif action == "add_member":
             username = request.POST.get("username", "").strip()
@@ -127,6 +140,7 @@ def room_settings_view(request, room_id):
                 )
                 if status == RoomMember.BLACKLIST:
                     SavedRoom.objects.filter(room=room, user=target).delete()
+                    _kick_user(target.pk, room.id)
 
         elif action == "remove_member":
             username = request.POST.get("username", "").strip()
@@ -140,6 +154,7 @@ def room_settings_view(request, room_id):
                         and room.visibility == Room.PRIVATE
                     ):
                         SavedRoom.objects.filter(room=room, user=target).delete()
+                        _kick_user(target.pk, room.id)
                     entry.delete()
 
     whitelist = RoomMember.objects.filter(
