@@ -9,14 +9,14 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
 
 ## 1. Code changes (do these before leaving your machine)
 
-- [ ] Move `ALLOWED_HOSTS` to an env var in `settings.py`
-- [ ] Add `CSRF_TRUSTED_ORIGINS` from env var (required for HTTPS in Django 4+)
-- [ ] Add `whitenoise` to `requirements.txt`
-- [ ] Add `whitenoise.middleware.WhiteNoiseMiddleware` to `MIDDLEWARE` in `settings.py` (directly after `SecurityMiddleware`)
-- [ ] Add `STATIC_ROOT = BASE_DIR / "staticfiles"` to `settings.py`
-- [ ] Add `python manage.py collectstatic --noinput` to `entrypoint.sh` so static files are collected on every container start
-- [ ] Set `SESSION_COOKIE_SECURE = True` in `settings.py`
-- [ ] Set `CSRF_COOKIE_SECURE = True` in `settings.py`
+- [x] Move `ALLOWED_HOSTS` to an env var in `settings.py`
+- [x] Add `CSRF_TRUSTED_ORIGINS` from env var (required for HTTPS in Django 4+)
+- [x] Add `whitenoise` to `requirements.txt`
+- [x] Add `whitenoise.middleware.WhiteNoiseMiddleware` to `MIDDLEWARE` in `settings.py` (directly after `SecurityMiddleware`)
+- [x] Add `STATIC_ROOT = BASE_DIR / "staticfiles"` to `settings.py`
+- [x] Add `python manage.py collectstatic --noinput` to `entrypoint.sh` so static files are collected on every container start
+- [x] Set `SESSION_COOKIE_SECURE = True` in `settings.py`
+- [x] Set `CSRF_COOKIE_SECURE = True` in `settings.py`
 - [ ] Commit and push all of the above
 
 ## 2. Provision the server
