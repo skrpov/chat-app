@@ -1,6 +1,6 @@
-## What 
+## What
 
-Chat app to learn django websockets / channels fundamentals for a more interesting project.
+Carrier Pigeon — a Telegram-inspired real-time chat app built on Django Channels and WebSockets.
 
 ## Building
 

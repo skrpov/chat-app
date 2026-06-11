@@ -25,7 +25,7 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
 - [ ] Enable billing — a credit card is required but the e2-micro in us-west1 is always free and will not be charged
 - [ ] Create a new project (or use an existing one)
 - [ ] Go to Compute Engine → VM instances → Create instance:
-  - Name: anything (e.g. `chat-app`)
+  - Name: anything (e.g. `carrier-pigeon`)
   - Region: `us-west1` (Oregon) — required for always-free tier
   - Machine type: `e2-micro` (2 vCPU shared, 1GB RAM)
   - Boot disk: Ubuntu 22.04 LTS, 30GB standard persistent disk
@@ -72,7 +72,7 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
 
 ## 7. Deploy the app
 
-- [ ] Clone the repo: `git clone https://github.com/skrpov/chat-app.git && cd chat-app`
+- [ ] Clone the repo: `git clone https://github.com/skrpov/chat-app.git && cd carrier-pigeon`
 - [ ] Create the `.env` file: `nano .env`
 - [ ] Populate `.env`:
   ```
