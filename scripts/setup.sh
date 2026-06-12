@@ -17,4 +17,8 @@ runuser -u $APP_USER -- $APP_DIR/venv/bin/pip install -r $APP_DIR/requirements.t
 
 echo "Create $APP_DIR/.env before starting the service."
 echo "Then run: cp $APP_DIR/scripts/carrier-pigeon.service /etc/systemd/system/"
-echo "          systemctl daemon-reload && systemctl enable --now carrier-pigeon"
+echo "          cp $APP_DIR/scripts/carrier-pigeon-deploy.service /etc/systemd/system/"
+echo "          cp $APP_DIR/scripts/carrier-pigeon-deploy.timer /etc/systemd/system/"
+echo "          systemctl daemon-reload"
+echo "          systemctl enable --now carrier-pigeon"
+echo "          systemctl enable --now carrier-pigeon-deploy.timer"

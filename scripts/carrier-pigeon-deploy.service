@@ -1,0 +1,6 @@
+[Unit]
+Description=Carrier Pigeon auto-deploy
+
+[Service]
+Type=oneshot
+ExecStart=/opt/carrier-pigeon/scripts/deploy.sh
