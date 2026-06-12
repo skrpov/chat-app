@@ -6,6 +6,7 @@ After=network.target
 User=carrier-pigeon
 WorkingDirectory=/opt/carrier-pigeon
 EnvironmentFile=/opt/carrier-pigeon/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings
 ExecStart=/opt/carrier-pigeon/venv/bin/daphne -b 0.0.0.0 -p 8000 config.asgi:application
 Restart=always
 RestartSec=5
