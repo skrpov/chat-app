@@ -37,7 +37,7 @@ function initChatPanel(roomId, userName) {
 
   function connectSocket(depth) {
     const socket = new WebSocket(
-      "ws://" + window.location.host + "/ws/chat/" + roomId + "/"
+      (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host + "/ws/chat/" + roomId + "/"
     );
     currentSocket = socket;
 
