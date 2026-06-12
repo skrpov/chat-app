@@ -6,9 +6,9 @@ APP_USER=carrier-pigeon
 
 cd $APP_DIR
 
-git fetch origin main
-CURRENT=$(git rev-parse HEAD)
-LATEST=$(git rev-parse origin/main)
+runuser -u $APP_USER -- git fetch origin main
+CURRENT=$(runuser -u $APP_USER -- git rev-parse HEAD)
+LATEST=$(runuser -u $APP_USER -- git rev-parse origin/main)
 
 if [ "$CURRENT" = "$LATEST" ]; then
     exit 0
