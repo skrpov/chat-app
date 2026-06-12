@@ -1,0 +1,14 @@
+[Unit]
+Description=Carrier Pigeon
+After=network.target
+
+[Service]
+User=carrier-pigeon
+WorkingDirectory=/opt/carrier-pigeon
+EnvironmentFile=/opt/carrier-pigeon/.env
+ExecStart=/opt/carrier-pigeon/venv/bin/daphne -b 0.0.0.0 -p 8000 config.asgi:application
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
