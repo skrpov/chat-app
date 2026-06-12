@@ -10,6 +10,7 @@ services:
   django-web:
     build: .
     container_name: carrier-pigeon
+    restart: always
     ports:
       - "8000:8000"
     environment:
