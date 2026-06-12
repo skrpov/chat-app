@@ -120,3 +120,12 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
   Then restart Docker: `sudo systemctl restart docker`
 - [ ] Enable unattended security upgrades: `sudo apt install unattended-upgrades`
 - [ ] To deploy a new version: `git pull && docker compose up django-web -d --build`
+
+## 10. Auto-deploy (future)
+
+Set up a systemd timer that polls GitHub and redeploys when main changes — no inbound access or SSH keys needed:
+- Script fetches latest commit hash from GitHub API (or via `git fetch`)
+- Compares to currently running hash
+- If different: `git pull && docker compose up django-web -d --build`
+
+> **Note on zero-downtime deploys:** Ideally a deploy would spin up a new instance, wait for it to be healthy, then retire the old one (blue-green). This isn't straightforward with a single free VM — the VM would need to host both instances simultaneously during the cutover, which it likely can't handle on 1GB RAM. Acceptable tradeoff for now; revisit if uptime becomes a priority.
