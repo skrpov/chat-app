@@ -87,10 +87,7 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer �
   ```
   This clones the repo to `/opt/carrier-pigeon`, creates the `carrier-pigeon` system user, sets up the Python 3.12 virtualenv, installs dependencies, and registers the systemd units.
 
-- [x] Create the `.env` file:
-  ```
-  sudo nano /opt/carrier-pigeon/.env
-  ```
+- [x] Create the `.env` file at `/opt/carrier-pigeon/.env`:
   ```
   DEBUG=false
   CHANNEL_LAYER_BACKEND=memory
@@ -146,4 +143,11 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer �
 
 > **Dockerfile hardening:** pip runs as root inside the container (Docker is still used for local dev). For a proper production image, add a non-root user in the Dockerfile.
 
-> **Zero-downtime deploys:** Ideally a deploy would spin up a new VM instance, wait for it to be healthy, then re-wire the load balancer and retire the old one (blue-green). Not straightforward here — there's no load balancer or instance group to swap behind. Would need a proper orchestration layer (e.g. GCP instance groups + load balancer) to do this cleanly.
+> **Zero-downtime deploys:** Ideally a deploy would spin up a new VM instance, wait for it to be healthy, then re-wire the load balancer and retire the old one (blue-green). Not straightforward here — there's no load balancer or instance group to swap behind.
+
+---
+
+## See also
+
+- [Deploy postmortem](deploy-postmortem.md) — issues encountered during the initial deploy and how they were resolved
+- [Reading list](reading-list.md) — docs for every tool used in this stack

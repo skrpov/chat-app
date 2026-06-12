@@ -1,6 +1,9 @@
-## What
+# Carrier Pigeon 🕊️
 
-Carrier Pigeon — a Telegram-inspired real-time chat app built on Django Channels and WebSockets.
+A Telegram-inspired real-time chat app — the worse version. Built on Django Channels and WebSockets.
+
+Live at: https://carrier-pigeon.duckdns.org 
+<br><small> See [deployment plan](docs/deployment-plan.md) </small>
 
 ## Building
 
@@ -50,6 +53,12 @@ docker compose up --build
         - [x] Room owner can add other users to a blacklist
     - [x] Rooms can be made private
       - [x] Room owner can add other users to a whitelist
+- [ ] Add app icon (favicon)
+- [ ] Show current room name in the browser tab title
+- [ ] Make the room sidebar resizable / collapsible (mobile support)
+- [ ] Add profile pictures
+- [ ] Add sign-in with Google
+- [ ] Add image sending support (long-term)
 - [ ] Secure redis so that it does not accept connections from other sources.
 - [x] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
 - [ ] Add hamburger menu for group list page s.t. the chat is more usable on mobile.
@@ -64,9 +73,10 @@ docker compose up --build
 
 
 ## References
-
 - https://www.w3schools.com/django/index.php
 - https://www.geeksforgeeks.org/python/learn-to-use-websockets-with-django/
 - https://channels.readthedocs.io/en/latest/tutorial/part_2.html
 - https://www.docker.com/blog/how-to-dockerize-django-app/
 - https://github.com/jpadilla/django-project-template/blob/master/.gitignore
+
+<small> See [reading list](docs/reading-list.md) </small>

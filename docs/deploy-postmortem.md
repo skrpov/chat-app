@@ -64,10 +64,10 @@ Issues encountered during the initial deployment of Carrier Pigeon to GCP.
 **Cause:** When running `manage.py runserver`, Django's management command infrastructure calls `django.setup()` automatically. Running `daphne config.asgi:application` directly just imports the module — `setup()` is never called, so models imported at module level in `asgi.py` fail.  
 **Fix:** Added `import django; django.setup()` in `asgi.py` after `os.environ.setdefault(...)`.
 
-## 13. Typo in systemd unit: `Enviroment` instead of `Environment`
-**Symptom:** `DJANGO_SETTINGS_MODULE` wasn't set despite being in the unit file; same `AppRegistryNotReady` error persisted.  
-**Cause:** Typo when editing the file manually in `nano`.  
-**Fix:** Corrected spelling, reloaded daemon, restarted service.
+## 13. `DJANGO_SETTINGS_MODULE` not set despite being in the unit file
+**Symptom:** Same `AppRegistryNotReady` error persisted after adding `Environment=DJANGO_SETTINGS_MODULE=config.settings`.  
+**Cause:** Typo in the key name (`Enviroment`) when editing the unit file manually — systemd silently ignored the invalid directive.  
+**Fix:** Corrected the spelling, reloaded daemon, restarted service.
 
 ## 14. Static files not collected on initial direct install
 **Symptom:** JS files returned `text/html` (Django's 404 page) with `NS_ERROR_CORRUPTED_CONTENT`.  
