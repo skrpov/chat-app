@@ -35,8 +35,8 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
 
 ## 3. Configure DNS
 
-- [ ] Create an A record in your DNS provider pointing your domain to the external IP
-- [ ] Wait for propagation — check with: `dig yourdomain.com`
+- [x] Create an A record in your DNS provider pointing your domain to the external IP
+- [x] Wait for propagation — check with: `dig carrier-pigeon.duckdns.org`
 
 ## 4. Secure the server
 
@@ -60,9 +60,9 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
   sudo apt update && sudo apt install caddy
   ```
-- [ ] Create `/etc/caddy/Caddyfile` (replace `yourdomain.com`):
+- [ ] Create `/etc/caddy/Caddyfile` (replace `carrier-pigeon.duckdns.org`):
   ```
-  yourdomain.com {
+  carrier-pigeon.duckdns.org {
       reverse_proxy localhost:8000
   }
   ```
@@ -80,8 +80,8 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
   CHANNEL_LAYER_BACKEND=memory
   SECRET_KEY=<generate below>
   FERNET_KEY=<generate below>
-  ALLOWED_HOSTS=yourdomain.com
-  CSRF_TRUSTED_ORIGINS=https://yourdomain.com
+  ALLOWED_HOSTS=carrier-pigeon.duckdns.org
+  CSRF_TRUSTED_ORIGINS=https://carrier-pigeon.duckdns.org
   ```
 - [ ] Generate `SECRET_KEY`:
   ```
@@ -100,7 +100,7 @@ Stack: single Django/Daphne container, SQLite, in-memory channel layer — no Re
 
 ## 8. Verify
 
-- [ ] Visit `https://yourdomain.com` — landing page loads with TLS padlock
+- [ ] Visit `https://carrier-pigeon.duckdns.org` — landing page loads with TLS padlock
 - [ ] Sign up for an account
 - [ ] Create a room and send a message
 - [ ] Open a second browser / incognito window, sign in as a different user, join the same room
