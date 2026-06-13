@@ -1,9 +1,51 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
+<style>
+  #rooms-sidebar {
+    flex: 0 0 auto;
+    width: var(--sidebar-width, 220px);
+    min-width: var(--sidebar-width, 220px);
+  }
+  #sidebar-resizer {
+    flex: 0 0 6px;
+    margin: 0 0.25rem;
+    cursor: col-resize;
+    border-radius: 3px;
+    background: transparent;
+    transition: background 0.15s ease;
+  }
+  #sidebar-resizer:hover { background: var(--bs-border-color); }
+  #sidebar-backdrop { display: none; }
+
+  @media (max-width: 767.98px) {
+    #rooms-sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 1045;
+      width: min(80vw, 320px);
+      min-width: 0;
+      box-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease;
+    }
+    #rooms-sidebar.collapsed { transform: translateX(-100%); }
+    #sidebar-resizer { display: none; }
+    #sidebar-backdrop.show {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 1040;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+</style>
+
 <div class="container-fluid py-3" style="max-width: 1100px;">
-  <div class="d-flex gap-3" style="height: calc(100vh - 40px);">
+  <div class="d-flex" style="height: calc(100vh - 40px);">
     {% include "partials/rooms_sidebar.html" %}
+    <div id="sidebar-backdrop"></div>
+    <div id="sidebar-resizer"></div>
     {% if room %}
       {% include "partials/chat_panel.html" %}
     {% else %}
@@ -15,4 +57,8 @@
 {% if room and user == room.owner %}
   {% include "partials/room_settings_modal.html" %}
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'sidebar.js' %}"></script>
 {% endblock %}
