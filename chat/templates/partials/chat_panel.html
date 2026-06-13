@@ -1,11 +1,14 @@
 {% load static %}
 <div class="flex-grow-1 d-flex flex-column gap-2" style="min-width: 0;">
   <div class="card flex-grow-1 d-flex flex-column" style="min-height: 0;">
-    <div class="card-header fw-semibold d-flex align-items-center justify-content-between" style="height: 3rem;">
-      <span>{{ room.name }} </span>
+    <div class="card-header fw-semibold d-flex align-items-center gap-2" style="height: 3rem;">
+      <button id="sidebar-toggle" type="button" class="btn btn-sm border-0 btn-outline-secondary d-md-none" title="Rooms">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <span class="text-truncate flex-grow-1">{{ room.name }}</span>
 
       {% if user == room.owner %}
-        <button class="btn btn-sm btn-outline-secondary"
+        <button class="btn btn-sm btn-outline-secondary flex-shrink-0"
                 data-bs-toggle="modal" data-bs-target="#roomSettingsModal"
                 title="Room settings">
           <i class="fa-solid fa-gear"></i> Room settings
