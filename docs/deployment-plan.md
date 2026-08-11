@@ -156,4 +156,3 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer �
 ## See also
 
 - [Deploy postmortem](deploy-postmortem.md) — issues encountered during the initial deploy and how they were resolved
-- [Reading list](reading-list.md) — docs for every tool used in this stack
