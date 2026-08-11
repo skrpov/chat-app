@@ -28,7 +28,7 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer â€
   - Name: anything (e.g. `carrier-pigeon`)
   - Region: `us-west1` (Oregon) â€” required for always-free tier
   - Machine type: `e2-micro` (2 vCPU shared, 1GB RAM)
-  - Boot disk: Ubuntu 22.04 LTS, 30GB standard persistent disk
+  - Boot disk: Debian 12 (bookworm), 30GB standard persistent disk
   - Under "Advanced" â†’ Security: paste your SSH public key
 - [x] VPC network â†’ Firewall: add rules allowing TCP 80 and TCP 443
 - [x] Note the external IP address once the instance is running
@@ -50,7 +50,9 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer â€
 
 ## 5. Install dependencies
 
-- [x] Install Python 3.12 (Ubuntu 22.04 ships with 3.11; Django 6 requires 3.12+):
+- [x] Install Python 3.12 (bookworm ships 3.11; Django 6 requires 3.12+). deadsnakes
+  builds for Ubuntu, so these are jammy packages installed on Debian â€” a workaround,
+  removed by the trixie migration in [Future work](#10-future-work):
   ```
   sudo apt install -y software-properties-common curl gpg
   curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776" | sudo gpg --dearmor -o /usr/share/keyrings/deadsnakes.gpg
@@ -138,6 +140,10 @@ Stack: Daphne running directly under systemd, SQLite, in-memory channel layer â€
 - [x] Enable unattended security upgrades: `sudo apt install unattended-upgrades`
 
 ## 10. Future work
+
+> **Postgres:** Move the database off SQLite so the data is not tied to this VM and more than one instance of the app can run against it.
+
+> **Debian trixie:** Move the VM to trixie, which ships Python 3.12, so the deadsnakes PPA is no longer needed. Update the Dockerfile base at the same time to keep it matching the VM.
 
 > **Auto-deploy polish:** `scripts/setup.sh` should be updated to run the systemd install steps instead of printing them as instructions.
 

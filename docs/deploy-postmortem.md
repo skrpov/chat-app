@@ -41,22 +41,22 @@ Issues encountered during the initial deployment of Carrier Pigeon to GCP.
 
 ## 8. `ufw` not installed
 **Symptom:** `ufw: command not found`.  
-**Cause:** The Ubuntu 22.04 image on GCP doesn't ship with UFW by default.  
+**Cause:** The Debian 12 image on GCP doesn't ship with UFW by default.  
 **Fix:** `sudo apt install -y ufw` before running firewall commands.
 
 ## 9. `add-apt-repository` crashed adding deadsnakes PPA
 **Symptom:** Python traceback: `AttributeError: 'NoneType' object has no attribute 'people'`.  
-**Cause:** Known bug in `software-properties-common` on some Ubuntu 22.04 versions when contacting Launchpad.  
+**Cause:** `software-properties-common` failed when contacting Launchpad.  
 **Fix:** Added the PPA manually via `curl` + `gpg` + writing to `/etc/apt/sources.list.d/`.
 
 ## 10. VM shipped with Python 3.11; Django 6.0.5 requires Python 3.12+
 **Symptom:** `ERROR: No matching distribution found for Django==6.0.5`.  
-**Cause:** Ubuntu 22.04's default Python is 3.11; Django 6 dropped support for anything below 3.12.  
+**Cause:** Debian 12's default Python is 3.11; Django 6 dropped support for anything below 3.12.  
 **Fix:** Installed Python 3.12 from the deadsnakes PPA and recreated the virtualenv with `python3.12`.
 
 ## 11. Virtualenv created without pip
 **Symptom:** `venv/bin/` contained only `python`, `python3`, `python3.11` — no `pip`.  
-**Cause:** System Python 3.11 didn't have the `ensurepip` module available (common on minimal Ubuntu installs).  
+**Cause:** System Python 3.11 didn't have the `ensurepip` module available (common on minimal installs).  
 **Fix:** Installed `python3.12-venv` which includes pip, then recreated the venv with `python3.12 -m venv --clear`.
 
 ## 12. `AppRegistryNotReady` when running Daphne directly

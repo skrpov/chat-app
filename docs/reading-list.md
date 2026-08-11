@@ -66,7 +66,7 @@ https://letsencrypt.org/how-it-works/
 ## Python / Environment
 
 **deadsnakes PPA**  
-Provides newer Python versions for Ubuntu. Used to install Python 3.12 on Ubuntu 22.04.  
+Provides newer Python versions for Ubuntu. The jammy packages are used to install Python 3.12 on Debian 12.  
 https://github.com/deadsnakes/
 
 **Python venv**  
