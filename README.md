@@ -53,23 +53,25 @@ docker compose up --build
         - [x] Room owner can add other users to a blacklist
     - [x] Rooms can be made private
       - [x] Room owner can add other users to a whitelist
-- [ ] Add app icon (favicon)
+- [x] Add app icon (favicon)
 - [ ] Show current room name in the browser tab title
-- [ ] Make the room sidebar resizable / collapsible (mobile support)
+- [x] Make the room sidebar resizable / collapsible (mobile support)
 - [ ] Add profile pictures
 - [ ] Add sign-in with Google
 - [ ] Add image sending support (long-term)
 - [ ] Secure redis so that it does not accept connections from other sources.
 - [x] Add re-connect behaviour in case of browser closing the connection or server dropping or else.
-- [ ] Add hamburger menu for group list page s.t. the chat is more usable on mobile.
-- [ ] Add a landing page instead of just redirecting to login page right off the bat.
+- [x] Add hamburger menu for group list page s.t. the chat is more usable on mobile.
+- [x] Add a landing page instead of just redirecting to login page right off the bat.
 - [ ] Add some kind of message encryption / hashing
 - [ ] Add a "delievered" indicator
 - [ ] Add a "read" indicator
-- [ ] Host the messenger on the WWW
+- [x] Host the messenger
 - [ ] Only new message send time when the time is significantly different
 - [ ] Dark mode / Global styles
 - [ ] Some kind of spam protection
+- [ ] All forms fields should not be cleared on form error
+- [ ] Database backups
 
 
 ## References
