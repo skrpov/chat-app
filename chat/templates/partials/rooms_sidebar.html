@@ -16,7 +16,14 @@
     {% endfor %}
   </div>
   <div class="card-footer py-0 d-flex align-items-center gap-2" style="height: 3rem;">
-    <span class="small text-muted text-truncate flex-grow-1">{{ user.username }}</span>
+    <a href="{% url 'profile' %}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-muted text-truncate flex-grow-1" title="Profile">
+      {% if user.profile.has_avatar %}
+        <img src="{% url 'avatar' user_id=user.id %}" alt="" class="rounded-circle flex-shrink-0" width="28" height="28" style="object-fit: cover;" />
+      {% else %}
+        <span class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; font-size: 0.85rem;">{{ user.username|first|upper }}</span>
+      {% endif %}
+      <span class="small text-truncate">{{ user.username }}</span>
+    </a>
     <form method="post" action="/accounts/logout/" class="mb-0">
       {% csrf_token %}
       <button type="submit" class="btn btn-sm btn-outline-primary">Logout</button>

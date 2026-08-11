@@ -56,7 +56,7 @@ docker compose up --build
 - [x] Add app icon (favicon)
 - [ ] Show current room name in the browser tab title
 - [x] Make the room sidebar resizable / collapsible (mobile support)
-- [ ] Add profile pictures
+- [x] Add profile pictures
 - [ ] Add sign-in with Google
 - [ ] Add image sending support (long-term)
 - [ ] Secure redis so that it does not accept connections from other sources.
